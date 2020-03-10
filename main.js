@@ -18,7 +18,7 @@ function onYScaleChanged() {
 // Load data and use this function to process each row
 function dataPreprocessor(row) {
     return {
-        //'fuelType': row['fuelType'],
+        'fuelType': row['fuelType'],
         'city08': +row['city08'],
         //'VClass': row['VClass'],
 
@@ -56,7 +56,7 @@ var yAxisG = chartG.append('g')
 d3.csv('vehicles_parsed.csv', dataPreprocessor).then(function(dataset) {
     // **** Your JavaScript code goes here ****
     cars = dataset;
-    console.log(cars);
+    //console.log(cars);
     xScale = d3.scaleLinear()
     .range([0, chartWidth]);
 
@@ -68,7 +68,7 @@ d3.csv('vehicles_parsed.csv', dataPreprocessor).then(function(dataset) {
 	dataset.columns.forEach(function(column) {
         //console.log(column);
     	domainMap[column] = d3.extent(dataset, function(data_element){
-            console.log(data_element[column]);
+            //console.log(data_element[column]);
         	return data_element[column];
     	});
 	});
@@ -102,8 +102,31 @@ function updateChart() {
         var ty = yScale(d[chartScales.y]);
         return 'translate('+[tx, ty]+')';
     });
+   
 	dotsEnter.append('circle')
-    	.attr('r', 3);
+        .attr('r', 3)
+        .style('fill', function(d) {
+            console.log("d.fuelType: " + d.fuelType);
+            if (d.fuelType == 'Electricity') {
+                return '#0dbd00';
+            } else if (d.fuelType == 'CNG') {
+                return '#0058bd';
+            } else if (d.fuelType == 'Diesel') {
+                return '#00bdb4';
+            } else if (d.fuelType == "Gasoline or E85") {
+                return '#8b00bd';
+            } else if (d.fuelType == "Gasoline or natural gas") {
+                return '#de0b91';
+            } else if (d.fuelType == "Midgrade") {
+                return '#de0b91';
+            } else if (d.fuelType == "Midgrade") {
+                return '#de0b91';
+            } else if (d.fuelType == "Premium") {
+                return '#de860b';
+            } else {
+                return '#ffa785';
+            } 
+        });
     
     dots.merge(dotsEnter)
     .transition()
