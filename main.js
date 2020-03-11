@@ -20,7 +20,7 @@ function dataPreprocessor(row) {
     return {
         'fuelType': row['fuelType'],
         'city08': +row['city08'],
-        //'VClass': row['VClass'],
+        'VClass': row['VClass'],
 
         // 'displacement (cc)': +row['displacement (cc)'],
         // 'power (hp)': +row['power (hp)'],
@@ -106,7 +106,7 @@ function updateChart() {
 	dotsEnter.append('circle')
         .attr('r', 3)
         .style('fill', function(d) {
-            console.log("d.fuelType: " + d.fuelType);
+            // console.log("d.fuelType: " + d.fuelType);
             if (d.fuelType == 'Electricity') {
                 return '#0dbd00';
             } else if (d.fuelType == 'CNG') {
@@ -127,6 +127,16 @@ function updateChart() {
                 return '#ffa785';
             } 
         });
+    dotsEnter.append('text')
+    .text(function(d) {
+    	return d.VClass
+    })
+    .on('mouseover', function(d) {
+        d3.select(this).transition().style('opacity', 1)
+    })
+    .on('mouseout', function(d) {
+        d3.select(this).transition().style('opacity', 0)
+    })
     
     dots.merge(dotsEnter)
     .transition()
@@ -136,11 +146,14 @@ function updateChart() {
         var ty = yScale(d[chartScales.y]);
         return 'translate('+[tx, ty]+')';
     });
-    dotsEnter.append('text')
-    .attr('y', -10)
-    .text(function(d) {
-        return d.name;
-    });
+
+    // dotsEnter.append('text')
+    // .attr('y', -10)
+    // .text(function(d) {
+    //     return d.name;
+    // });
+
+
 
 
     

@@ -5,7 +5,7 @@
 
 .dot text {
     text-anchor: middle;
-    font-size: 10px;
+    font-size: 15px;
     pointer-events: none;
     fill: #555;
 }
