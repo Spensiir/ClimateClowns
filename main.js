@@ -21,7 +21,6 @@ function dataPreprocessor(row) {
         'fuelType': row['fuelType'],
         'city08': +row['city08'],
         'VClass': row['VClass'],
-
         // 'displacement (cc)': +row['displacement (cc)'],
         // 'power (hp)': +row['power (hp)'],
         // 'weight (lb)': +row['weight (lb)'],

@@ -5,7 +5,7 @@ mpgData = data['mpgData'] == 'Y'
 
 reg = data[mpgData]
 # reg = reg.groupby(['year']).groups
-reg = reg.groupby(['fuelType','year','VClass'])['city08'].mean().to_csv('output_file.csv')
+reg = reg.groupby(['fuelType','year','VClass', 'highway08'])['city08'].mean().to_csv('output_file.csv')
 # regC = reg['year']('city08').mean()
 # regH = reg.groupby('year')['highway08'].mean()
 
