@@ -11,6 +11,7 @@ function onYScaleChanged() {
     var select = d3.select('#yScaleSelect').node();
     // Get current value of select element, save to global chartScales
     chartScales.y = select.options[select.selectedIndex].value
+    console.log(chartScales.y);
     // Update chart
     updateChart();
 }
@@ -20,7 +21,9 @@ function dataPreprocessor(row) {
     return {
         'fuelType': row['fuelType'],
         'city08': +row['city08'],
+        'highway08': +row['highway08'],
         'VClass': row['VClass'],
+
         // 'displacement (cc)': +row['displacement (cc)'],
         // 'power (hp)': +row['power (hp)'],
         // 'weight (lb)': +row['weight (lb)'],
@@ -78,6 +81,7 @@ d3.csv('vehicles_parsed.csv', dataPreprocessor).then(function(dataset) {
 
 
 function updateChart() {
+    console.log(chartScales.y);
     // **** Draw and Update your chart here ****
 	yScale.domain(domainMap[chartScales.y]).nice();
 	xScale.domain(domainMap[chartScales.x]).nice();
