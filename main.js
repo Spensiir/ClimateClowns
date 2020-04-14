@@ -32,16 +32,17 @@ function dataPreprocessor(row) {
     };
 }
 
-var svg = d3.select('svg');
+var svg = d3.select('svg')
+            .attr('width', 1300);
 
 // Get layout parameters
 var svgWidth = +svg.attr('width');
 var svgHeight = +svg.attr('height');
 
-var padding = {t: 40, r: 40, b: 40, l: 40};
+var padding = {t: 40, r: 40, b: 40, l: 60};
 
 // Compute chart dimensions
-var chartWidth = svgWidth - padding.l - padding.r;
+var chartWidth = svgWidth - padding.l - padding.r ;
 var chartHeight = svgHeight - padding.t - padding.b;
 
 // Create a group element for appending chart elements
@@ -50,8 +51,10 @@ var chartG = svg.append('g')
 
 // Create groups for the x- and y-axes
 var xAxisG = chartG.append('g')
-    .attr('class', 'x axis')
+    .attr('id', 'xaxis')
+    .attr('class', 'xaxis')
     .attr('transform', 'translate('+[0, chartHeight]+')');
+
 var yAxisG = chartG.append('g')
     .attr('class', 'y axis');
 
@@ -79,21 +82,35 @@ d3.csv('vehicles_parsed.csv', dataPreprocessor).then(function(dataset) {
     updateChart();
 });
 
-
+function clickMe(year) {
+    alert("the year is: " + year);
+}
 function updateChart() {
-    console.log(chartScales.y);
+    console.log("gets here");
     // **** Draw and Update your chart here ****
-	yScale.domain(domainMap[chartScales.y]).nice();
-	xScale.domain(domainMap[chartScales.x]).nice();
+	yScale.domain(domainMap[chartScales.y]).nice;
+    xScale.domain(domainMap[chartScales.x]);
+    
+    var timeAxis = d3.axisBottom(xScale).ticks(30).tickFormat(d3.format("d"));//.tickValues([1983,1984,1985,1986,1987,1988,1989,1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019]);
+    //.tickFormat(d3.timeFormat());
+    //var tickFormat = timeAxis.;
 
 	xAxisG.transition()
     .duration(750)
-    .call(d3.axisBottom(xScale)).
-    call(d3.axisBottom(xScale));
+    .call(timeAxis);
+
+    d3.selectAll(".tick text")
+    .style("cursor", "pointer")
+    //.filter(function(d){ return typeof(d) == "string"; })
+    .on("click", function(d) {
+        clickMe(d);
+    });
+
+    //.attr("transform", "translate(0)");;
 	yAxisG.transition()
     .duration(750)
     .call(d3.axisLeft(yScale))
-    .call(d3.axisLeft(yScale));
+    .attr("transform", "translate(-20)");
     
 	var dots = chartG.selectAll('.dot')
     .data(cars);
