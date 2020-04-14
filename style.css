@@ -4,9 +4,10 @@
 }
 
 .dot text {
-    text-anchor: middle;
-    font-size: 15px;
+    text-anchor: end;
+    font-size: 20px;
     pointer-events: none;
+    alignment-baseline: middle;
     fill: #555;
 }
 .dot text {
