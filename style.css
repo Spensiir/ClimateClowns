@@ -22,6 +22,10 @@
     fill: orange;
     outline: 3px;
 }
+
+.xaxis text{
+    fill: #0000ff;
+}
 body {
     font-family: "Open Sans";
     margin: 0;
