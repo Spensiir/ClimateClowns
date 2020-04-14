@@ -1,11 +1,19 @@
 import pandas as pd
+from collections import defaultdict
 
-data = pd.read_csv("vehiclesdataset.csv",low_memory=False)
+vehicles = pd.read_csv("vehiclesdataset.csv",low_memory=False)
+emissions = pd.read_csv("emissions.csv")
+
+data = vehicles.merge(emissions, on="id")
+
 mpgData = data['mpgData'] == 'Y'
 
+
 reg = data[mpgData]
+# scoreData = reg['score'] != None
+# reg = reg[scoreData]
 # reg = reg.groupby(['year']).groups
-reg = reg.groupby(['fuelType','year','VClass', 'highway08'])['city08'].mean().to_csv('output_file.csv')
+reg = reg.groupby(['fuelType','year','VClass', 'highway08','fuelCost08', 'score'])['city08'].mean().to_csv('output_file.csv')
 # regC = reg['year']('city08').mean()
 # regH = reg.groupby('year')['highway08'].mean()
 

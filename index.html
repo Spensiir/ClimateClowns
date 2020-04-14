@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Lab 6 - Cars</title>
+    <title>Climate Clowns</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
     <link rel="stylesheet" href="./style.css">
 </head>
@@ -15,6 +15,8 @@
             <select class="custom-select small" id="yScaleSelect" onchange="onYScaleChanged()">
               <option value="city08">City (mpg)</option>
               <option value="highway08">Highway (mpg)</option>
+              <option value="fuelCost08">Fuel Cost (dollars)</option>
+              <option value="score">EPA Score</option>
               <!-- <option value="Fuel Type">Fuel Type</option>
               <option value="Car Type">Car Type</option> -->
 
@@ -25,13 +27,13 @@
             </select>
         </div>
         <div style="margin-left: 160px;">
-            <svg width="600" height="600" style="border: 1px solid #777;">
+            <svg width="600" height="600">
             </svg>
         </div>
         <div style="margin-left: 380px;">
-            <label for="categorySelect">X Scale:</label>
-            <select class="custom-select small" id="xScaleSelect" onchange="onXScaleChanged()">
-              <option value="year">year</option>
+            <!-- <label for="categorySelect">X Scale:</label> -->
+            <!-- <select class="custom-select small" id="xScaleSelect" onchange="onXScaleChanged()"> -->
+              <option value="year">Year</option>
               <!-- <option value="City (mpg)">City (mpg)</option> -->
 <!--               <option value="Fuel Type">Fuel Type</option>
               <option value="Car Type">Car Type</option> -->
@@ -40,7 +42,7 @@
               <option value="weight (lb)">weight (lb)</option>
               <option value="0-60 mph (s)">0-60 mph (s)</option> -->
               
-            </select>
+            <!-- </select> -->
         </div>
     </div>
 </body>

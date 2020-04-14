@@ -22,7 +22,9 @@ function dataPreprocessor(row) {
         'fuelType': row['fuelType'],
         'city08': +row['city08'],
         'highway08': +row['highway08'],
+        'fuelCost08': +row['fuelCost08'],
         'VClass': row['VClass'],
+        'score': +row['score'],
 
         // 'displacement (cc)': +row['displacement (cc)'],
         // 'power (hp)': +row['power (hp)'],
