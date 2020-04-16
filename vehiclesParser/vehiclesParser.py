@@ -7,13 +7,14 @@ emissions = pd.read_csv("emissions.csv")
 data = vehicles.merge(emissions, on="id")
 
 mpgData = data['mpgData'] == 'Y'
+mpgData = data[mpgData]
+ghgScore = data['ghgScore'] == '-1'
 
-
-reg = data[mpgData]
+reg = data[ghgScore]
 # scoreData = reg['score'] != None
 # reg = reg[scoreData]
 # reg = reg.groupby(['year']).groups
-reg = reg.groupby(['fuelType','year','VClass', 'highway08','fuelCost08', 'score'])['city08'].mean().to_csv('output_file.csv')
+reg = reg.groupby(['fuelType','year','VClass', 'highway08','fuelCost08', 'score', 'ghgScore'])['city08'].mean().to_csv('output_file.csv')
 # regC = reg['year']('city08').mean()
 # regH = reg.groupby('year')['highway08'].mean()
 
