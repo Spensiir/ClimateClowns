@@ -34,7 +34,9 @@ function dataPreprocessor(row) {
 }
 
 var svg = d3.select('svg')
-						.attr('width', 1300);
+                        .attr('width', 1300);
+                        
+var underXAxis = d3.select('#xAxis');
 
 // Get layout parameters
 var svgWidth = +svg.attr('width');
@@ -60,12 +62,17 @@ var yAxisG = chartG.append('g')
     .attr('class', 'y axis');
 
 d3.csv('vehicles_parsed.csv', dataPreprocessor).then(function(dataset) {
+
+    
+
     // **** Your JavaScript code goes here ****
     cars = dataset;
     //console.log(cars);
     xScale = d3.scaleLinear().range([0, chartWidth]);
     // xScale = d3.scaleBand().range([0, chartWidth]).padding(0.4);
 	yScale = d3.scaleLinear().range([chartHeight, 0]);
+
+    
 
     domainMap = {};
 
@@ -79,15 +86,32 @@ d3.csv('vehicles_parsed.csv', dataPreprocessor).then(function(dataset) {
 	// console.log(domainMap)
     // Create global object called chartScales to keep state
     chartScales = {x: 'year', y: 'city08'};
+    underXAxis.append('button')
+        .attr("id", "return")
+        .style("display", "none")
+        .text("click here to return")
+        .on("click", function() {
+            updateChart();
+        });
     updateChart();
 });
+
+function showReturnButton() {
+    document.getElementById("return").style.display = "inline";
+}
+
+function hideReturnButton() {
+    document.getElementById("return").style.display = "none";
+}
 
 function clickMe(year) {
     // alert("the year is: " + year);
     makeSubGraph(year);
 }
 function updateChart() {
+    hideReturnButton();
 
+    console.log("updateCHARTTT");
 	svg.selectAll(".bar").remove();
 
     console.log("gets here");
@@ -95,7 +119,7 @@ function updateChart() {
     xScale.domain(domainMap[chartScales.x]);
 	yScale.domain(domainMap[chartScales.y]).nice;
     
-    var timeAxis = d3.axisBottom(xScale).ticks(30).tickFormat(d3.format("d"));//.tickValues([1983,1984,1985,1986,1987,1988,1989,1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019]);
+    var timeAxis = d3.axisBottom(xScale).ticks(30).tickFormat(d3.format("d"));
     //.tickFormat(d3.timeFormat());
     //var tickFormat = timeAxis.;
 
@@ -182,6 +206,7 @@ function updateChart() {
 // Remember code outside of the data callback function will run before the data loads
 
 function makeSubGraph(year) {
+    showReturnButton();
 	console.log(year)
 	console.log("makeSubGraph")
 
@@ -241,19 +266,20 @@ function makeSubGraph(year) {
     fuelArr = Array.from(fuelSet)
     vehicleArr = Array.from(classSet)
 
-	secondAxis = d3.scaleBand().range([0, chartWidth]).domain(fuelArr);
+	secondScale = d3.scaleBand().range([0, chartWidth]).domain(fuelArr);
 	yScale.domain(d3.extent(city08Array))
 
-	xAxisG.transition().duration(750).call(d3.axisBottom(secondAxis));
+	xAxisG.transition().duration(750).call(d3.axisBottom(secondScale));
     yAxisG.transition().duration(750).call(d3.axisLeft(yScale)).attr("transform", "translate(-20)");
 
 	// draw bars
-    chartG.selectAll(".bar")
+    chartG
+    .selectAll(".bar")
     .data(fuelArr).enter()
     .append("rect")
     .attr("class", "bar")
     .attr("x", function(d, i) {
-    	return secondAxis(d)
+        return secondScale(d);
     })
     .attr("y", function(d, i) {
     	var arr = fuelTypeCityDict.get(d)
