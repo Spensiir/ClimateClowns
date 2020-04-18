@@ -12,6 +12,7 @@ function onYScaleChanged() {
     // Get current value of select element, save to global chartScales
     chartScales.y = select.options[select.selectedIndex].value
     console.log(chartScales.y);
+    // console.log(domainMap)
     // Update chart
     updateChart();
 }
@@ -33,7 +34,7 @@ function dataPreprocessor(row) {
 }
 
 var svg = d3.select('svg')
-            .attr('width', 1300);
+						.attr('width', 1300);
 
 // Get layout parameters
 var svgWidth = +svg.attr('width');
@@ -62,34 +63,37 @@ d3.csv('vehicles_parsed.csv', dataPreprocessor).then(function(dataset) {
     // **** Your JavaScript code goes here ****
     cars = dataset;
     //console.log(cars);
-    xScale = d3.scaleLinear()
-    .range([0, chartWidth]);
-
-	yScale = d3.scaleLinear()
-    .range([chartHeight, 0]);
+    xScale = d3.scaleLinear().range([0, chartWidth]);
+    // xScale = d3.scaleBand().range([0, chartWidth]).padding(0.4);
+	yScale = d3.scaleLinear().range([chartHeight, 0]);
 
     domainMap = {};
 
 	dataset.columns.forEach(function(column) {
         //console.log(column);
-    	domainMap[column] = d3.extent(dataset, function(data_element){
-            //console.log(data_element[column]);
+    	domainMap[column] = d3.extent(dataset, function(data_element) {
+            // console.log(data_element[column]);
         	return data_element[column];
     	});
 	});
+	// console.log(domainMap)
     // Create global object called chartScales to keep state
     chartScales = {x: 'year', y: 'city08'};
     updateChart();
 });
 
 function clickMe(year) {
-    alert("the year is: " + year);
+    // alert("the year is: " + year);
+    makeSubGraph(year);
 }
 function updateChart() {
+
+	svg.selectAll(".bar").remove();
+
     console.log("gets here");
     // **** Draw and Update your chart here ****
-	yScale.domain(domainMap[chartScales.y]).nice;
     xScale.domain(domainMap[chartScales.x]);
+	yScale.domain(domainMap[chartScales.y]).nice;
     
     var timeAxis = d3.axisBottom(xScale).ticks(30).tickFormat(d3.format("d"));//.tickValues([1983,1984,1985,1986,1987,1988,1989,1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019]);
     //.tickFormat(d3.timeFormat());
@@ -126,6 +130,7 @@ function updateChart() {
 	dotsEnter.append('circle')
         .attr('r', 3)
         .style('fill', function(d) {
+        	// console.log(d)
             // console.log("d.fuelType: " + d.fuelType);
             if (d.fuelType == 'Electricity') {
                 return '#0dbd00';
@@ -172,10 +177,81 @@ function updateChart() {
     // .text(function(d) {
     //     return d.name;
     // });
-
-
-
-
     
 }
 // Remember code outside of the data callback function will run before the data loads
+
+function makeSubGraph(year) {
+	console.log(year)
+	console.log("makeSubGraph")
+
+	/////
+	var highway08Array = []
+	var city08Array = []
+	var fuelSet = new Set()
+	var classSet = new Set()
+	cars.forEach(function(d) {
+    	if (d.year == year) {
+    		highway08Array.push(d.highway08)
+    		city08Array.push(d.city08)
+    		fuelSet.add(d.fuelType)
+    		classSet.add(d.VClass)
+    	}
+    })
+
+	console.log(highway08Array)
+	console.log(city08Array)
+	console.log(fuelSet)
+	console.log(classSet)
+	////
+
+
+	// Array.from(fuelSet)
+	var detailX = d3.scaleBand().range([0, chartWidth]).padding(0.4)
+	xScale.domain([1, 5])
+	yScale.domain(d3.extent(highway08Array))
+
+
+
+	// test test test test test 
+    var data = {
+  		"2011": "45",
+  		"2012": "47",
+  		"2013": "52",
+  		"2014": "70",
+  		"2015": "75",
+  		"2016": "78"
+	};
+
+	var years = ["2011", '2012', '2013', '2014', '2015', '2016']
+
+	// remove all the existing dots
+	svg.selectAll(".dot").remove();
+
+	//  update doamin
+	arr = [1,2,3,4,5]
+	// xScale.domain([1, 5])
+
+	chartG.selectAll(".bar")
+    .data(years).enter()
+    .append("rect")
+    .attr("class", "bar")
+    .attr("x", function(d, i) {
+    	return xScale(years[i])
+    })
+    .attr("y", function(d, i) {
+    	return yScale(data[d])
+    })
+    .attr("width", 20)
+    .attr('height', function(d, i) {
+    	return chartHeight - yScale(data[d])
+    })
+
+
+	// axis transition
+	// var timeAxis = d3.axisBottom(xScale).tickFormat(d3.format("d"));
+	var timeAxis = d3.axisBottom(xScale).tickFormat(d3.format("d"));
+	xAxisG.transition().duration(750).call(timeAxis);
+    yAxisG.transition().duration(750).call(d3.axisLeft(yScale)).attr("transform", "translate(-20)");
+
+}
