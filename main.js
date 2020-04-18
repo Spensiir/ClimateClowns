@@ -68,10 +68,11 @@ d3.csv('vehicles_parsed.csv', dataPreprocessor).then(function(dataset) {
 	yScale = d3.scaleLinear()
     .range([chartHeight, 0]);
 
+    
+
     secondAxis = d3.scaleBand()
     .range([0, chartWidth])
-    .domain(["apples", "oranges", "bananas"])
-    .nice();
+    .domain(["apples", "oranges", "bananas"]);
     // .domain(dataset.map(function(d) { 
     //         console.log(d.VClass);
     //         return d.VClass;
