@@ -70,11 +70,13 @@ d3.csv('vehicles_parsed.csv', dataPreprocessor).then(function(dataset) {
 
     secondAxis = d3.scaleBand()
     .range([0, chartWidth])
-    .domain(dataset.map(function(d) { 
-        if (!secondAxis.domain.contains(d.VClass)) {
-            return d.VClass;
-        }
-         }));
+    .domain(["apples", "oranges", "bananas"])
+    .nice();
+    // .domain(dataset.map(function(d) { 
+    //         console.log(d.VClass);
+    //         return d.VClass;
+            
+    //     }));
 
     domainMap = {};
 
