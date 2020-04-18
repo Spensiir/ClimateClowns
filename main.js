@@ -68,25 +68,37 @@ d3.csv('vehicles_parsed.csv', dataPreprocessor).then(function(dataset) {
 	yScale = d3.scaleLinear()
     .range([chartHeight, 0]);
 
+    secondAxis = d3.scaleBand()
+    .range([0, chartWidth])
+    .domain(dataset.map(function(d) { 
+        if (!secondAxis.domain.contains(d.VClass)) {
+            return d.VClass;
+        }
+         }));
+
     domainMap = {};
 
 	dataset.columns.forEach(function(column) {
-        //console.log(column);
     	domainMap[column] = d3.extent(dataset, function(data_element){
-            //console.log(data_element[column]);
+            //console.log(data_element[column] + column);
         	return data_element[column];
     	});
-	});
+    });
+    console.log(domainMap);
     // Create global object called chartScales to keep state
     chartScales = {x: 'year', y: 'city08'};
     updateChart();
 });
 
-function clickMe(year) {
+function zoomYear(year) {
+
+    
+    xAxisG.transition()
+    .duration(750)
+    .call(d3.axisBottom(secondAxis));
     alert("the year is: " + year);
 }
 function updateChart() {
-    console.log("gets here");
     // **** Draw and Update your chart here ****
 	yScale.domain(domainMap[chartScales.y]).nice;
     xScale.domain(domainMap[chartScales.x]);
@@ -103,7 +115,7 @@ function updateChart() {
     .style("cursor", "pointer")
     //.filter(function(d){ return typeof(d) == "string"; })
     .on("click", function(d) {
-        clickMe(d);
+        zoomYear(d);
     });
 
     //.attr("transform", "translate(0)");;
