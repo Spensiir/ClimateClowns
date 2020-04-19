@@ -39,3 +39,11 @@ label {
 #main {
     margin: 20px;
 }
+
+.bar {
+    fill: steelblue;
+}
+
+.bar2 {
+    fill: steelblue;
+}

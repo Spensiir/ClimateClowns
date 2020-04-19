@@ -9,6 +9,7 @@
 <body>
     <div id="main">
         <div style="position: absolute; top: 300px;">
+            
             <div>
                 <label for="categorySelect">Y Scale:</label>
             </div>
@@ -30,10 +31,12 @@
             <svg width="600" height="600">
             </svg>
         </div>
-        <div style="margin-left: 380px;">
-            <!-- <label for="categorySelect">X Scale:</label> -->
-            <!-- <select class="custom-select small" id="xScaleSelect" onchange="onXScaleChanged()"> -->
-              <option value="year">Year</option>
+
+        <div id = "xAxis" style="margin-left: 380px;">
+            <label for="categorySelect">X Scale:</label>
+            <select class="custom-select small" id="xScaleSelect" onchange="onXScaleChanged()">
+              <option value="year">year</option>
+              
               <!-- <option value="City (mpg)">City (mpg)</option> -->
 <!--               <option value="Fuel Type">Fuel Type</option>
               <option value="Car Type">Car Type</option> -->
