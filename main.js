@@ -23,7 +23,9 @@ function dataPreprocessor(row) {
         'fuelType': row['fuelType'],
         'city08': +row['city08'],
         'highway08': +row['highway08'],
+        'fuelCost08': +row['fuelCost08'],
         'VClass': row['VClass'],
+        'score': +row['score'],
 
         // 'displacement (cc)': +row['displacement (cc)'],
         // 'power (hp)': +row['power (hp)'],
@@ -74,9 +76,18 @@ d3.csv('vehicles_parsed.csv', dataPreprocessor).then(function(dataset) {
 
     
 
+    secondAxis = d3.scaleBand()
+    .range([0, chartWidth])
+    .domain(dataset.map(function(d) { 
+        if (!secondAxis.domain.contains(d.VClass)) {
+            return d.VClass;
+        }
+         }));
+
     domainMap = {};
 
 	dataset.columns.forEach(function(column) {
+
         //console.log(column);
     	domainMap[column] = d3.extent(dataset, function(data_element) {
             // console.log(data_element[column]);
@@ -84,6 +95,7 @@ d3.csv('vehicles_parsed.csv', dataPreprocessor).then(function(dataset) {
     	});
 	});
 	// console.log(domainMap)
+
     // Create global object called chartScales to keep state
     chartScales = {x: 'year', y: 'city08'};
     underXAxis.append('button')
@@ -95,6 +107,7 @@ d3.csv('vehicles_parsed.csv', dataPreprocessor).then(function(dataset) {
         });
     updateChart();
 });
+
 
 function showReturnButton() {
     document.getElementById("return").style.display = "inline";
@@ -116,6 +129,7 @@ function updateChart() {
     svg.selectAll(".bar2").remove();
 
     // console.log("gets here");
+
     // **** Draw and Update your chart here ****
     xScale.domain(domainMap[chartScales.x]);
 	yScale.domain(domainMap[chartScales.y]).nice;
@@ -132,7 +146,7 @@ function updateChart() {
     .style("cursor", "pointer")
     //.filter(function(d){ return typeof(d) == "string"; })
     .on("click", function(d) {
-        clickMe(d);
+        zoomYear(d);
     });
 
     //.attr("transform", "translate(0)");;
