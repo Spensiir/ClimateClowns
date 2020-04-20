@@ -82,9 +82,13 @@ d3.csv('vehicles_parsed.csv', dataPreprocessor).then(function(dataset) {
     // **** Your JavaScript code goes here ****
     cars = dataset;
     //console.log(cars);
-    xScale = d3.scaleLinear().range([0, chartWidth]);
-    // xScale = d3.scaleBand().range([0, chartWidth]).padding(0.4);
-	yScale = d3.scaleLinear().range([chartHeight, 0]);
+    xScale = d3.scaleLinear()
+    .range([0, chartWidth]);
+
+	yScale = d3.scaleLinear()
+    .range([chartHeight, 0]);
+
+    
 
     
 
@@ -118,6 +122,22 @@ function hideReturnButton() {
     document.getElementById("return").style.display = "none";
 }
 
+function showYLabel() {
+    document.getElementById("yScaleSelect").style.display = "inline";
+}
+
+function hideYLabel() {
+    document.getElementById("yScaleSelect").style.display = "none";
+}
+
+function showSubYLabel() {
+    document.getElementById("ySubgraph").style.display = "inline";
+}
+
+function hideSubYLabel() {
+    document.getElementById("ySubgraph").style.display = "none";
+}
+
 function clickMe(year) {
     // alert("the year is: " + year);
     makeSubGraph(year);
@@ -127,6 +147,8 @@ function updateChart() {
     vehicleSet = new Set()
     fuelSet = new Set()
 
+    hideSubYLabel();
+    showYLabel();
     hideReturnButton();
 
 	svg.selectAll(".bar").remove();
@@ -137,6 +159,7 @@ function updateChart() {
     xScale.domain(domainMap[chartScales.x]).nice;
     // console.log(domainMap[chartScales.x]);
 	yScale.domain(domainMap[chartScales.y]).nice;
+    xScale.domain(domainMap[chartScales.x]);
     
     var timeAxis = d3.axisBottom(xScale).ticks(30).tickFormat(d3.format("d"));
     //.tickFormat(d3.timeFormat());
@@ -246,6 +269,8 @@ function updateChart() {
 // Remember code outside of the data callback function will run before the data loads
 
 function makeSubGraph(year) {
+    hideYLabel();
+    showSubYLabel();
     showReturnButton();
 	console.log(year)
 	// console.log("makeSubGraph")
