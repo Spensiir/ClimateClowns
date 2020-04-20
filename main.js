@@ -122,6 +122,22 @@ function hideReturnButton() {
     document.getElementById("return").style.display = "none";
 }
 
+function showYLabel() {
+    document.getElementById("yScaleSelect").style.display = "inline";
+}
+
+function hideYLabel() {
+    document.getElementById("yScaleSelect").style.display = "none";
+}
+
+function showSubYLabel() {
+    document.getElementById("ySubgraph").style.display = "inline";
+}
+
+function hideSubYLabel() {
+    document.getElementById("ySubgraph").style.display = "none";
+}
+
 function clickMe(year) {
     // alert("the year is: " + year);
     makeSubGraph(year);
@@ -131,6 +147,8 @@ function updateChart() {
     vehicleSet = new Set()
     fuelSet = new Set()
 
+    hideSubYLabel();
+    showYLabel();
     hideReturnButton();
 
 	svg.selectAll(".bar").remove();
@@ -251,6 +269,8 @@ function updateChart() {
 // Remember code outside of the data callback function will run before the data loads
 
 function makeSubGraph(year) {
+    hideYLabel();
+    showSubYLabel();
     showReturnButton();
 	console.log(year)
 	// console.log("makeSubGraph")
