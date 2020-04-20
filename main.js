@@ -12,10 +12,7 @@ function onYScaleChanged() {
     // Get current value of select element, save to global chartScales
     chartScales.y = select.options[select.selectedIndex].value
     console.log(chartScales.y);
-<<<<<<< HEAD
-=======
     // console.log(domainMap)
->>>>>>> 42534fc7caaf9309a6ec19779e019002c9dd0717
     // Update chart
     updateChart();
 }
@@ -181,12 +178,8 @@ function updateChart() {
 	dotsEnter.append('circle')
         .attr('r', 3)
         .style('fill', function(d) {
-<<<<<<< HEAD
-            // console.log("d.fuelType: " + d.fuelType);
-=======
             vehicleSet.add(d.VClass)
             fuelSet.add(d.fuelType)
->>>>>>> 42534fc7caaf9309a6ec19779e019002c9dd0717
             if (d.fuelType == 'Electricity') {
                 return colors["Electricity"];
             } else if (d.fuelType == 'CNG') {
@@ -476,48 +469,4 @@ function makeSubGraph(year) {
     .attr("text-anchor", 'left')
     .style("alignment-baseline", "middle")
 
-<<<<<<< HEAD
-    // highway avg bars
-    var current2 = 0
-    chartG
-    .selectAll(".bar2")
-    .data(fuelArr).enter()
-    .append("rect")
-    .attr("class", "bar2")
-    .attr("x", function(d, i) {
-        var middlePadding = chartWidth / fuelArr.length
-        var edgePadding = (chartWidth - (middlePadding * (fuelArr.length - 1))) / 2
-        console.log("Edge Padding:" + edgePadding)
-        console.log("Middle Padding:" + middlePadding)
-        if (i == 0) {
-            current2 += edgePadding
-            return current2
-        } else {
-            current2 += middlePadding
-            return current2
-        }
-    })
-    .attr("y", function(d, i) {
-        var arr = fuelTypeHighwayDict.get(d)
-        var total = 0;
-        for (var i = 0; i < arr.length; i++) {
-            total += arr[i];
-        }
-        var arrAvg = total / arr.length
-        return yScale(arrAvg)
-    })
-    .attr("width", 20)
-    .attr('height', function(d, i) {
-        var arr = fuelTypeHighwayDict.get(d)
-        var total = 0;
-        for (var i = 0; i < arr.length; i++) {
-            total += arr[i];
-        }
-        var arrAvg = total / arr.length;
-        return chartHeight - yScale(arrAvg)
-    })
-    .attr('fill', "orange")
 }
-=======
-}
->>>>>>> 42534fc7caaf9309a6ec19779e019002c9dd0717
