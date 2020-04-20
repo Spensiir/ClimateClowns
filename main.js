@@ -23,7 +23,9 @@ function dataPreprocessor(row) {
         'city08': +row['city08'],
         'highway08': +row['highway08'],
         'VClass': row['VClass'],
-
+        'fuelCost08': +row['fuelCost08'],
+        // 'score': +row['score'],
+        
         // 'displacement (cc)': +row['displacement (cc)'],
         // 'power (hp)': +row['power (hp)'],
         // 'weight (lb)': +row['weight (lb)'],
@@ -33,7 +35,9 @@ function dataPreprocessor(row) {
 }
 
 var svg = d3.select('svg')
-            .attr('width', 1300);
+                        .attr('width', 1300);
+                        
+var underXAxis = d3.select('#xAxis');
 
 // Get layout parameters
 var svgWidth = +svg.attr('width');
@@ -59,6 +63,9 @@ var yAxisG = chartG.append('g')
     .attr('class', 'y axis');
 
 d3.csv('vehicles_parsed.csv', dataPreprocessor).then(function(dataset) {
+
+    
+
     // **** Your JavaScript code goes here ****
     cars = dataset;
     //console.log(cars);
@@ -70,43 +77,57 @@ d3.csv('vehicles_parsed.csv', dataPreprocessor).then(function(dataset) {
 
     
 
-    secondAxis = d3.scaleBand()
-    .range([0, chartWidth])
-    .domain(["apples", "oranges", "bananas"]);
-    // .domain(dataset.map(function(d) { 
-    //         console.log(d.VClass);
-    //         return d.VClass;
-            
-    //     }));
+    
 
     domainMap = {};
 
 	dataset.columns.forEach(function(column) {
-    	domainMap[column] = d3.extent(dataset, function(data_element){
-            //console.log(data_element[column] + column);
+        //console.log(column);
+    	domainMap[column] = d3.extent(dataset, function(data_element) {
+            // console.log(data_element[column]);
         	return data_element[column];
     	});
-    });
-    console.log(domainMap);
+	});
+	// console.log(domainMap)
     // Create global object called chartScales to keep state
     chartScales = {x: 'year', y: 'city08'};
+    underXAxis.append('button')
+        .attr("id", "return")
+        .style("display", "none")
+        .text("click here to return")
+        .on("click", function() {
+            updateChart();
+        });
     updateChart();
 });
 
-function zoomYear(year) {
+function showReturnButton() {
+    document.getElementById("return").style.display = "inline";
+}
 
-    
-    xAxisG.transition()
-    .duration(750)
-    .call(d3.axisBottom(secondAxis));
-    alert("the year is: " + year);
+function hideReturnButton() {
+    document.getElementById("return").style.display = "none";
+}
+
+function clickMe(year) {
+    // alert("the year is: " + year);
+    makeSubGraph(year);
 }
 function updateChart() {
+    hideReturnButton();
+
+    // console.log("updateCHARTTT");
+	svg.selectAll(".bar").remove();
+    svg.selectAll(".bar2").remove();
+
+    // console.log("gets here");
     // **** Draw and Update your chart here ****
+    xScale.domain(domainMap[chartScales.x]).nice;
+    console.log(domainMap[chartScales.x]);
 	yScale.domain(domainMap[chartScales.y]).nice;
     xScale.domain(domainMap[chartScales.x]);
     
-    var timeAxis = d3.axisBottom(xScale).ticks(30).tickFormat(d3.format("d"));//.tickValues([1983,1984,1985,1986,1987,1988,1989,1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019]);
+    var timeAxis = d3.axisBottom(xScale).ticks(30).tickFormat(d3.format("d"));
     //.tickFormat(d3.timeFormat());
     //var tickFormat = timeAxis.;
 
@@ -118,7 +139,7 @@ function updateChart() {
     .style("cursor", "pointer")
     //.filter(function(d){ return typeof(d) == "string"; })
     .on("click", function(d) {
-        zoomYear(d);
+        clickMe(d);
     });
 
     //.attr("transform", "translate(0)");;
@@ -182,15 +203,144 @@ function updateChart() {
         return 'translate('+[tx, ty]+')';
     });
 
-    // dotsEnter.append('text')
-    // .attr('y', -10)
-    // .text(function(d) {
-    //     return d.name;
-    // });
-
-
-
-
-    
 }
 // Remember code outside of the data callback function will run before the data loads
+
+function makeSubGraph(year) {
+    showReturnButton();
+	// console.log(year)
+	// console.log("makeSubGraph")
+
+	// remove all the existing dots
+	svg.selectAll(".dot").remove();
+
+	// filter data 
+	var highway08Array = []
+	var city08Array = []
+	var fuelSet = new Set()
+	var classSet = new Set()
+
+	// initialize dictionary
+	// fuelTypeHighwayDict looks like [key: 'Diesel',
+	//       						   value: [21, 21, 18, 21, 27, 27, 33]]
+ 	var fuelTypeHighwayDict = new Map();
+ 	var fuelTypeCityDict = new Map();
+
+    cars.forEach(function(d) {
+    	if (d.year == year) {
+    		if (fuelTypeHighwayDict.has(d.fuelType) && fuelTypeCityDict.has(d.fuelType)) {
+    			fuelTypeHighwayDict.get(d.fuelType).push(d.highway08)
+    			fuelTypeCityDict.get(d.fuelType).push(d.city08)
+    		} else if (fuelTypeHighwayDict.has(d.fuelType) && !fuelTypeCityDict.has(d.fuelType)) {
+    			fuelTypeHighwayDict.get(d.fuelType).push(d.highway08)
+    			fuelTypeCityDict.set(d.fuelType, new Array)
+    			fuelTypeCityDict.get(d.fuelType).push(d.city08)
+    		} else if (!fuelTypeHighwayDict.has(d.fuelType) && fuelTypeCityDict.has(d.fuelType)) {
+    			fuelTypeHighwayDict.set(d.fuelType, new Array)
+    			fuelTypeHighwayDict.get(d.fuelType).push(d.highway08)
+    			fuelTypeCityDict.get(d.fuelType).push(d.city08)
+    		} else {
+    			fuelTypeHighwayDict.set(d.fuelType, new Array)
+    			fuelTypeCityDict.set(d.fuelType, new Array)
+    			fuelTypeHighwayDict.get(d.fuelType).push(d.highway08)
+    			fuelTypeCityDict.get(d.fuelType).push(d.city08)
+    		}
+    		highway08Array.push(d.highway08)
+    		city08Array.push(d.city08)
+    		fuelSet.add(d.fuelType)
+    		classSet.add(d.VClass)
+    	}
+    })
+
+    fuelArr = Array.from(fuelSet)
+    vehicleArr = Array.from(classSet)
+
+	secondScale = d3.scaleBand().range([0, chartWidth]).domain(fuelArr);
+    // console.log(chartWidth)
+
+	yScale.domain(d3.extent(city08Array))
+
+	xAxisG.transition().duration(750).call(d3.axisBottom(secondScale));
+    yAxisG.transition().duration(750).call(d3.axisLeft(yScale)).attr("transform", "translate(-20)");
+
+	// city avg bars
+    var current = 0
+    chartG
+    .selectAll(".bar")
+    .data(fuelArr).enter()
+    .append("rect")
+    .attr("class", "bar")
+    .attr("x", function(d, i) {
+        var middlePadding = chartWidth / fuelArr.length
+        var edgePadding = (chartWidth - (middlePadding * (fuelArr.length - 1))) / 2
+        // console.log("Edge Padding:" + edgePadding)
+        // console.log("Middle Padding:" + middlePadding)
+        if (i == 0) {
+            current += edgePadding
+            return current - 20
+        } else {
+            current += middlePadding
+            return current - 20
+        }
+    })
+    .attr("y", function(d, i) {
+    	var arr = fuelTypeCityDict.get(d)
+    	var total = 0;
+    	for (var i = 0; i < arr.length; i++) {
+    		total += arr[i];
+    	}
+    	var arrAvg = total / arr.length
+    	return yScale(arrAvg)
+    })
+    .attr("width", 20)
+    .attr('height', function(d, i) {
+    	var arr = fuelTypeCityDict.get(d)
+    	var total = 0;
+    	for (var i = 0; i < arr.length; i++) {
+    		total += arr[i];
+    	}
+    	var arrAvg = total / arr.length;
+    	return chartHeight - yScale(arrAvg)
+    })
+
+    // highway avg bars
+    var current2 = 0
+    chartG
+    .selectAll(".bar2")
+    .data(fuelArr).enter()
+    .append("rect")
+    .attr("class", "bar2")
+    .attr("x", function(d, i) {
+        var middlePadding = chartWidth / fuelArr.length
+        var edgePadding = (chartWidth - (middlePadding * (fuelArr.length - 1))) / 2
+        console.log("Edge Padding:" + edgePadding)
+        console.log("Middle Padding:" + middlePadding)
+        if (i == 0) {
+            current2 += edgePadding
+            return current2
+        } else {
+            current2 += middlePadding
+            return current2
+        }
+    })
+    .attr("y", function(d, i) {
+        var arr = fuelTypeHighwayDict.get(d)
+        var total = 0;
+        for (var i = 0; i < arr.length; i++) {
+            total += arr[i];
+        }
+        var arrAvg = total / arr.length
+        return yScale(arrAvg)
+    })
+    .attr("width", 20)
+    .attr('height', function(d, i) {
+        var arr = fuelTypeHighwayDict.get(d)
+        var total = 0;
+        for (var i = 0; i < arr.length; i++) {
+            total += arr[i];
+        }
+        var arrAvg = total / arr.length;
+        return chartHeight - yScale(arrAvg)
+    })
+    .attr('fill', "orange")
+}
