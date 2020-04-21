@@ -1,4 +1,8 @@
-// Global functions called when select elements changed
+/**
+ * Update XScale when changed
+ * @param {void}
+ * @return {void}
+ */
 function onXScaleChanged() {
     var select = d3.select('#xScaleSelect').node();
     // Get current value of select element, save to global chartScales
@@ -7,17 +11,32 @@ function onXScaleChanged() {
     updateChart();
 }
 
+/**
+ * Update YScale when changed
+ * @param {void}
+ * @return {void}
+ */
 function onYScaleChanged() {
     var select = d3.select('#yScaleSelect').node();
     // Get current value of select element, save to global chartScales
     chartScales.y = select.options[select.selectedIndex].value
     console.log(chartScales.y);
-    // console.log(domainMap)
-    // Update chart
+    if(chartScales.y == "city08"){
+        document.getElementsByClassName("title")[0].innerHTML = "City (MPG) Vs. Years";
+    }else if(chartScales.y == "highway08"){
+        document.getElementsByClassName("title")[0].innerHTML = "Highway (MPG) Vs. Years";
+    }else if(chartScales.y == "fuelCost08"){
+        document.getElementsByClassName("title")[0].innerHTML = "Fuel Cost (Dollars) Vs. Years";
+    }
     updateChart();
 }
 
-// Load data and use this function to process each row
+/**
+ * Load data and use this function to process each row
+ * hide y label
+ * @param {[String]} row data to be display at y-axis
+ * @return {void}
+ */
 function dataPreprocessor(row) {
     return {
         'fuelType': row['fuelType'],
@@ -35,6 +54,7 @@ function dataPreprocessor(row) {
     };
 }
 
+// Colors for different cars
 var colors = {
     "Electricity": '#0dbd00',
     "CNG": '#0058bd',
@@ -46,16 +66,20 @@ var colors = {
     "Else": '#ffa785'
     }
 
-var svg = d3.select('svg').attr('width', 1300);
+var svg = d3.select('svg#svgGraph')
+    .attr('width', document.getElementById("svgGraph").clientWidth);
 
+// SVG for keys
 var keysSvg = d3.select("#keys")                
 
+// SVG for axis
 var underXAxis = d3.select('#xAxis');
 
 // Get layout parameters
 var svgWidth = +svg.attr('width');
 var svgHeight = +svg.attr('height');
 
+// padding in chart
 var padding = {t: 40, r: 40, b: 40, l: 60};
 
 // Compute chart dimensions
@@ -72,40 +96,28 @@ var xAxisG = chartG.append('g')
     .attr('class', 'xaxis')
     .attr('transform', 'translate('+[0, chartHeight]+')');
 
+// create y-axis
 var yAxisG = chartG.append('g')
     .attr('class', 'y axis');
 
+// Read CSV data
 d3.csv('vehicles_parsed.csv', dataPreprocessor).then(function(dataset) {
-
-    
-
     // **** Your JavaScript code goes here ****
     cars = dataset;
-    //console.log(cars);
-    xScale = d3.scaleLinear()
-    .range([0, chartWidth]);
-
-	yScale = d3.scaleLinear()
-    .range([chartHeight, 0]);
-
-    
-
-    
+    xScale = d3.scaleLinear().range([0, chartWidth]);
+    yScale = d3.scaleLinear().range([chartHeight, 0]);
 
     domainMap = {};
 
-	dataset.columns.forEach(function(column) {
-        //console.log(column);
-    	domainMap[column] = d3.extent(dataset, function(data_element) {
-            // console.log(data_element[column]);
-        	return data_element[column];
-    	});
-	});
-	// console.log(domainMap)
-    // Create global object called chartScales to keep state
+    dataset.columns.forEach(function(column) {
+        domainMap[column] = d3.extent(dataset, function(data_element) {
+            return data_element[column];
+        });
+    });
+
     chartScales = {x: 'year', y: 'city08'};
     underXAxis.append('button')
-        .attr("id", "return")
+        .attr("id", "returnButton")
         .style("display", "none")
         .text("click here to return")
         .on("click", function() {
@@ -114,75 +126,115 @@ d3.csv('vehicles_parsed.csv', dataPreprocessor).then(function(dataset) {
     updateChart();
 });
 
+/**
+ * show return button
+ * @param {void}
+ * @return {void}
+ */
 function showReturnButton() {
-    document.getElementById("return").style.display = "inline";
+    document.getElementById("returnButton").style.display = "inline";
 }
 
+/**
+ * hide return button
+ * @param {void}
+ * @return {void}
+ */
 function hideReturnButton() {
-    document.getElementById("return").style.display = "none";
+    document.getElementById("returnButton").style.display = "none";
 }
 
+/**
+ * show y label
+ * @param {void}
+ * @return {void}
+ */
 function showYLabel() {
     document.getElementById("yScaleSelect").style.display = "inline";
 }
 
+/**
+ * hide y label
+ * @param {void}
+ * @return {void}
+ */
 function hideYLabel() {
     document.getElementById("yScaleSelect").style.display = "none";
 }
 
+/**
+ * show sub y label
+ * @param {void}
+ * @return {void}
+ */
 function showSubYLabel() {
     document.getElementById("ySubgraph").style.display = "inline";
 }
 
+/**
+ * hide sub y label
+ * @param {void}
+ * @return {void}
+ */
 function hideSubYLabel() {
     document.getElementById("ySubgraph").style.display = "none";
 }
 
+/**
+ * Calls a makeSubGraph function and pass in selected year.
+ * @param {void}
+ * @return {void}
+ */
 function clickMe(year) {
-    // alert("the year is: " + year);
     makeSubGraph(year);
 }
-function updateChart() {
 
+/**
+ * update chart for different y-axis
+ * @param {void}
+ * @return {void}
+ */
+function updateChart() {
+    // vehicle set to add different type of vehicles
     vehicleSet = new Set()
+    // feul set to add different type of fuels
     fuelSet = new Set()
 
     hideSubYLabel();
     showYLabel();
     hideReturnButton();
+    document.getElementById("year").innerHTML = "Years";
 
-	svg.selectAll(".bar").remove();
+    // remove all the elements from subgraph
+    svg.selectAll(".bar").remove();
     d3.select('#keys').selectAll(".barCategory").remove();
     d3.select('#keys').selectAll(".myLabels").remove();
 
-    // **** Draw and Update your chart here ****
+    // Draw and Update chart
     xScale.domain(domainMap[chartScales.x]).nice;
-    // console.log(domainMap[chartScales.x]);
-	yScale.domain(domainMap[chartScales.y]).nice;
+    yScale.domain(domainMap[chartScales.y]).nice;
     xScale.domain(domainMap[chartScales.x]);
     
     var timeAxis = d3.axisBottom(xScale).ticks(30).tickFormat(d3.format("d"));
-    //.tickFormat(d3.timeFormat());
-    //var tickFormat = timeAxis.;
 
-	xAxisG.transition()
+    // show transitions when circles are being replaced
+    xAxisG.transition()
     .duration(750)
     .call(timeAxis);
 
     d3.selectAll(".tick text")
     .style("cursor", "pointer")
-    //.filter(function(d){ return typeof(d) == "string"; })
     .on("click", function(d) {
         clickMe(d);
     });
 
-    //.attr("transform", "translate(0)");;
-	yAxisG.transition()
+    yAxisG.transition()
     .duration(750)
     .call(d3.axisLeft(yScale))
     .attr("transform", "translate(-20)");
     
-	var dots = chartG.selectAll('.dot')
+    // append circles elements
+    var dots = chartG.selectAll('.dot')
     .data(cars);
     var dotsEnter = dots.enter()
     .append('g')
@@ -193,7 +245,8 @@ function updateChart() {
         return 'translate('+[tx, ty]+')';
     });
 
-	dotsEnter.append('circle')
+    // add colors to the circles
+    dotsEnter.append('circle')
         .attr('r', 3)
         .style('fill', function(d) {
             vehicleSet.add(d.VClass)
@@ -216,9 +269,10 @@ function updateChart() {
                 return colors["Else"];
             } 
         });
+    // add vehicle type text to each circles
     dotsEnter.append('text')
     .text(function(d) {
-    	return d.VClass
+        return d.VClass
     })
     .on('mouseover', function(d) {
         d3.select(this).transition().style('opacity', 1)
@@ -227,6 +281,7 @@ function updateChart() {
         d3.select(this).transition().style('opacity', 0)
     })
     
+    // transitions of circles
     dots.merge(dotsEnter)
     .transition()
     .duration(750)
@@ -236,8 +291,10 @@ function updateChart() {
         return 'translate('+[tx, ty]+')';
     });
 
+    // array of different types of fuels
     var keys = Array.from(fuelSet)
 
+    // draw graph on key dimensions
     keysSvg.selectAll(".category")
     .data(Object.keys(colors))
     .enter()
@@ -252,6 +309,7 @@ function updateChart() {
         return colors[d]
     })
 
+    // add text for each key dimension
     keysSvg.selectAll(".myLables")
     .data(Object.keys(colors))
     .enter()
@@ -261,41 +319,47 @@ function updateChart() {
     .attr('y', function(d, i) {
         return (i + 1) * 15
     })
-    .style("fill", function(d) { return colors[d]})
+    .style("fill", function(d) { return colors[d]} )
     .text(function(d) { return d })
     .attr("text-anchor", 'left')
     .style("alignment-baseline", "middle")
 }
-// Remember code outside of the data callback function will run before the data loads
 
-function makeSubGraph(year) {
+/**
+ * Generates a sub graph
+ * @param {int} year - year selected by a user
+ * @return {void}
+ */
+function makeSubGraph(year) 
+{
+    // hide all unnecessay labels from main graph
     hideYLabel();
     showSubYLabel();
     showReturnButton();
-	console.log(year)
-	// console.log("makeSubGraph")
+    document.getElementById("year").innerHTML = year;
 
-	// remove all the existing dots
-	svg.selectAll(".dot").remove();
+    // remove all the existing dots and key dimensions from previous graph
+    svg.selectAll(".dot").remove();
     d3.select('#keys').selectAll(".category").remove();
     d3.select('#keys').selectAll(".myLables").remove();
 
-	// filter data 
-	var highway08Array = []
-	var city08Array = []
+    // initialize data structures for data which will be filtered soon
+    var highway08Array = []
+    var city08Array = []
     var fuelCost08Array = []
-	var fuelSet = new Set()
-	var vehicleSet = new Set()
+    var fuelSet = new Set()
+    var vehicleSet = new Set()
 
-	// initialize dictionary
-	// fuelTypeHighwayDict looks like [key: 'Diesel',
-	//       						   value: [21, 21, 18, 21, 27, 27, 33]]
- 	var fuelTypeHighwayDict = new Map();
- 	var fuelTypeCityDict = new Map();
+    // initialize dictionary
+    // fuelTypeHighwayDict looks like [key: 'Diesel',
+    //                                 value: [21, 21, 18, 21, 27, 27, 33]]
+    var fuelTypeHighwayDict = new Map();
+    var fuelTypeCityDict = new Map();
     var fuelTypeCostDict = new Map();
 
+    // filter data based on selected year and selected y-axis
     cars.forEach(function(d) {
-    	if (d.year == year) {
+        if (d.year == year) {
             if (chartScales.y == "city08") {
                 if (!fuelTypeCityDict.has(d.fuelType)) {
                     fuelTypeCityDict.set(d.fuelType, new Array)
@@ -312,19 +376,21 @@ function makeSubGraph(year) {
                 }
                 fuelTypeCostDict.get(d.fuelType).push(d.fuelCost08)
             }
-    		highway08Array.push(d.highway08)
-    		city08Array.push(d.city08)
+            highway08Array.push(d.highway08)
+            city08Array.push(d.city08)
             fuelCost08Array.push(d.fuelCost08)
-    		fuelSet.add(d.fuelType)
-    		vehicleSet.add(d.VClass)
-    	}
+            fuelSet.add(d.fuelType)
+            vehicleSet.add(d.VClass)
+        }
     })
 
+    // Array of different fuel types
     fuelArr = Array.from(fuelSet)
+    // Array of different vehicle types
     vehicleArr = Array.from(vehicleSet)
 
-	secondScale = d3.scaleBand().range([0, chartWidth]).domain(fuelArr);
-    // console.log(chartWidth)
+    // make a scale for sub graph
+    secondScale = d3.scaleBand().range([0, chartWidth]).domain(fuelArr);
     if (chartScales.y == 'city08') {
         yScale.domain(d3.extent(city08Array))
     } else if (chartScales.y == 'highway08') {
@@ -333,11 +399,13 @@ function makeSubGraph(year) {
         yScale.domain(d3.extent(fuelCost08Array))
     }
 
-	xAxisG.transition().duration(750).call(d3.axisBottom(secondScale));
+    // transition functions for y and x axis
+    xAxisG.transition().duration(750).call(d3.axisBottom(secondScale));
     yAxisG.transition().duration(750).call(d3.axisLeft(yScale)).attr("transform", "translate(-20)");
 
+    // bar position
     var currentBarPosition = 0
-    // City Average Bars
+    // Draw City Average Bars
     if (chartScales.y == "city08") {
         chartG
         .selectAll(".bar")
@@ -377,7 +445,7 @@ function makeSubGraph(year) {
         .attr("fill", 'orange')
     }
 
-    // Highway average bars
+    // Draw Highway average bars
     if (chartScales.y == 'highway08') {
         chartG
         .selectAll(".bar")
@@ -417,7 +485,7 @@ function makeSubGraph(year) {
         .attr('fill', "orange")
     }
 
-    //
+    // Draw annual cost average bars
     if (chartScales.y == 'fuelCost08') {
         chartG
         .selectAll(".bar")
@@ -463,6 +531,7 @@ function makeSubGraph(year) {
         "fuelCost08": ["Annual Fuel Cost"]
     }
 
+    // add key dimensions 
     keysSvg.selectAll(".barCategory")
     .data(labelDict[chartScales.y])
     .enter()
@@ -475,6 +544,7 @@ function makeSubGraph(year) {
     .attr("r", 3)
     .style("fill", "orange")
 
+    // add text for each key dimension
     keysSvg.selectAll(".myLabels")
     .data(labelDict[chartScales.y])
     .enter()
