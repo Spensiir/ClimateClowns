@@ -7,41 +7,22 @@
     <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-    <div id="main">
+    <div class="graph" id="main">
+        <h2 class="title">City (MPG) Vs. Years</h2>
         <div style="position: absolute; top: 300px;">
-            
-            <!-- <div>
-                <label for="categorySelect">Y Scale:</label>
-            </div> -->
             <select class="custom-select small" id="yScaleSelect" onchange="onYScaleChanged()">
               <option value="city08">City (mpg)</option>
               <option value="highway08">Highway (mpg)</option>
               <option value="fuelCost08">Fuel Cost (dollars)</option>
-              <!-- <option value="score">EPA Smog Rating</option> -->
-              <!-- <option value="Fuel Type">Fuel Type</option>
-              <option value="Car Type">Car Type</option> -->
             </select>
-            <text id="ySubgraph"> Mileage </text>
+            <text id="ySubgraph">  </text>
         </div>
         <div style="margin-left: 160px;">
-            <svg width="600" height="600">
-            </svg>
-            <svg id="keys" height=600 width=220></svg>
+            <svg id="svgGraph" height="600" style="overflow: visible"></svg>
+            <svg id="keys" height=200 width=220></svg>
         </div>
-        <div id = "xAxis" style="margin-left: 380px;">
-            <!-- <label for="categorySelect">X Scale:</label>
-            <select class="custom-select small" id="xScaleSelect" onchange="onXScaleChanged()"> -->
-              <option value="year">Year</option>
-              
-              <!-- <option value="City (mpg)">City (mpg)</option> -->
-<!--               <option value="Fuel Type">Fuel Type</option>
-              <option value="Car Type">Car Type</option> -->
-              
- <!--              <option selected value="power (hp)">power (hp)</option>
-              <option value="weight (lb)">weight (lb)</option>
-              <option value="0-60 mph (s)">0-60 mph (s)</option> -->
-              
-            <!-- </select> -->
+        <div id = "xAxis" style="margin-left: 80px; text-align: center;">
+              <option id="year">Years</option>
         </div>
     </div>
 </body>
